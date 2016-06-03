@@ -10,31 +10,37 @@ function listErrors($errArr)
     $errorMessage .= '</ul>';
     return $errorMessage;
 }
-function addUser($email, $firstName, $lastName, $password) {
-    $line = json_encode([
+
+function addUser($email, $firstName, $lastName, $password)
+{
+    //TODO: implement user id - Realized
+    $line = [
+        'userId' => uniqid(),
         'email' => $email,
-        'firstname' => $firstName,
+        'firstName' => $firstName,
         'lastName' => $lastName,
         'password' => sha1($password)
-            ]);
-    $userDb = fopen('users.db', 'a+');
+    ];
+    $userDb = fopen('db/users.db', 'a+');
     if ($userDb) {
-        fwrite($userDb, $line . PHP_EOL);
+        fwrite($userDb, json_encode($line) . PHP_EOL);
         fclose($userDb);
-        return true;
-        
+        return $line;
+
+
     }
-    
+
 }
-function isUserExist($email) {
+
+function isUserExist($email)
+{
     $userDb = fopen('db/users.db', 'r+');
     if (!$userDb) {
         return FALSE;
-    }
-    else {
+    } else {
         while (!feof($userDb)) {
             $line = fgets($userDb);
-            if($line) {
+            if ($line) {
                 $line = json_decode($line, true);
                 if ($email == $line['email']) {
                     fclose($userDb);
@@ -43,47 +49,80 @@ function isUserExist($email) {
             }
         }
         fclose($userDb);
-        return FALSE;
+        return false;
     }
 }
 
-function checkUser($email, $password) {
+function checkUser($email, $password)
+{
     $password = sha1($password);
-    $userDb = fopen('db/usersDb', 'r');
-        if(!$userDb) {
-            return false;
-        }
-        else {
+    $userDb = fopen('db/users.db', 'r');
+    if (!$userDb) {
+        return false;
+    } else {
         while (!feof($userDb)) {
             $line = fgets($userDb);
-            if($line) {
+            if ($line) {
                 $line = json_decode($line, true);
-                if ($email == $line['email'] && $password == $line['password'] ) {
+                if ($email == $line['email'] && $password == $line['password']) {
                     fclose($userDb);
-                    return true;
+                    return $line;
                 }
             }
         }
         fclose($userDb);
-        return FALSE;
+        return false;
     }
 }
 
-function addPost($userId, $title, $content, $filePath = false) {
-    $userDb = fopen('db/' . $userId . 'db', 'a+');
-    if(!userDb) {
+function addPost($userId, $title, $content, $filePath = false)
+{
+    $userDb = fopen('db/' . $userId . '.db', 'a+');
+    if (!$userDb) {
         return false;
     }
-    
+    else {
     if ($filePath && is_uploaded_file($filePath)) {
-        $pathInfo = pathinfo($filepath);
-        $imageName = 'img_' . time() . $pathInfo['extension'];
-        move_uploaded_file($filepath, 'img/' . $imageName);
+        //TODO: check image (getimagesize) - Realized
+        $types = ['image/gif' => 'gif', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
+        $pathInfo = pathinfo($filePath);
+        $imgInfo = getimagesize($filePath);
+        if ($imgInfo && array_key_exists($imgInfo['mime'], $types)) {
+            $ext = explode('/', $imgInfo['mime']);
+            $imageName = 'img_' . time() . '.' . $ext[1];
+            move_uploaded_file($filePath, 'img/' . $imageName);
+        }
     }
-    $line = json_encode([
+
+    fwrite($userDb, json_encode([
         'title' => $title,
-        'content' = > $content,
+        'content' => $content,
         'createdAt' => date("d.m.Y H:i:s"),
-        'image' => $imageName;
-        ])
+        'image' => $imageName
+    ]) . PHP_EOL);
+
+    fclose($userDb);
+    return true;
+    }
+}
+
+function listPosts($userId) {
+    $userPosts = [];
+    $filePath = 'db/' . $userId . '.db';
+    $file = fopen($filePath, 'r');
+    if (!$file) {
+        return false;
+    }
+    else {
+        while (!feof($file)) {
+            $line = fgets($file);
+            if ($line) {
+                $line = json_decode($line, true);
+                array_push($userPosts, $line);
+            }
+        }
+        fclose($file);
+        return $userPosts;
+    }
+
 }

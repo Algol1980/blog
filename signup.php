@@ -3,7 +3,7 @@ session_start();
 
 require 'functions.php';
 
-$required = ['email', 'firstName', 'lastname', 'password', 'confirmPassword'];
+$required = ['email', 'firstName', 'lastName', 'password', 'confirmPassword'];
 
 if (!empty($_POST)) {
     foreach ($required as $value) {
@@ -19,15 +19,18 @@ if ($_POST['password'] != $_POST['confirmPassword']) {
     }
     else {
         if(!isUserExist($_POST['email'])) {
-            if (addUser($_POST['email'], $_POST['firstname'], $_POST['lastName'], $_POST['password'])) {
+            $user = (addUser($_POST['email'], $_POST['firstName'], $_POST['lastName'], $_POST['password']));
+             if ($user) {
                 $_SESSION['user'] = true;
-                $_SESSION['firstName'] = $_POST['firstname'];
-                $_SESSION['lastname'] = $_POST['lastName'];
+                $_SESSION['userId'] = $user['userId'];
+                $_SESSION['firstName'] = $user['firstName'];
+                $_SESSION['lastName'] = $user['lastName'];
                 header("Location: index.php");
             }
         }
     }
 }
+require 'header.php';
 ?>
 <div class="container">
 
@@ -37,7 +40,7 @@ if ($_POST['password'] != $_POST['confirmPassword']) {
                 <h2>Sign up</h2>
             </div>
             <div class="panel-body">
-                <form>
+                <form method="post">
                     <div class="form-group">
                         <label>Email</label>
                         <input type="email" name="email" class="form-control" />

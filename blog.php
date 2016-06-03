@@ -1,40 +1,34 @@
 <?php
+session_start();
+require 'functions.php';
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+if (isset($_SESSION['user']) && isset($_SESSION['userId'])) {
+    $userPosts = listPosts($_SESSION['userId']);
+
+}
+
 require 'header.php';
 ?>
 
 <div class="container">
 
     <div class="post">
-        <h1 class="post-header">Hello World</h1>
+        <?php if($userPosts) {
+            foreach($userPosts as $key => $value) { ?>
+        <h1 class="post-header"><?php echo $value['title']; ?></h1>
         <hr />
+        <?php echo isset($value['image']) ? '<img src="img/' . $value['image'] .'" />' : '' ?>
         <p class="post-content">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            <?php echo $value['content']; ?>
         </p>
         <hr />
         <p class="post-when-by">
-            Posted on July 23, 18:30 by Андрей Иванов
+            <?php echo $value['createdAt']; ?>
         </p>
+            <?php }
+         } ?>
     </div>
 
-    <div class="post">
-        <h1 class="post-header">My Favorite Dog</h1>
-        <hr />
-        <img src="img/dog.jpg" />
-        <hr />
-        <p class="post-content">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </p>
-        <hr />
-        <p class="post-when-by">
-            Posted on July 23, 18:30 by Андрей Иванов
-        </p>
-    </div>
 
 
     <nav>

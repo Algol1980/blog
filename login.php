@@ -4,7 +4,14 @@ session_start();
 require 'functions.php';
 if(!empty($_POST)) {
     if (isset($_POST['email']) && isset($_POST['password'])) {
-        $user = checkUser($_POST['email'], $_POST['email']);
+        $user = checkUser($_POST['email'], $_POST['password']);
+        if($user) {
+            $_SESSION['user'] = true;
+            $_SESSION['userId'] = $user['userId'];
+            $_SESSION['firstName'] = $user['firstName'];
+            $_SESSION['lastName'] = $user['lastName'];
+            header("Location: index.php");
+        }
         
     }
 }
@@ -19,7 +26,7 @@ require 'header.php';
                 <h2>Log in</h2>
             </div>
             <div class="panel-body">
-                <form>
+                <form method="post">
                     <div class="form-group">
                         <label>Email</label>
                         <input type="email" name="email" class="form-control" />
