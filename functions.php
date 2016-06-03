@@ -85,11 +85,9 @@ function addPost($userId, $title, $content, $filePath = false)
     if ($filePath && is_uploaded_file($filePath)) {
         //TODO: check image (getimagesize) - Realized
         $types = ['image/gif' => 'gif', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
-        $pathInfo = pathinfo($filePath);
         $imgInfo = getimagesize($filePath);
         if ($imgInfo && array_key_exists($imgInfo['mime'], $types)) {
-            $ext = explode('/', $imgInfo['mime']);
-            $imageName = 'img_' . time() . '.' . $ext[1];
+            $imageName = 'img_' . time() . '.' . $types[$imgInfo['mime']];
             move_uploaded_file($filePath, 'img/' . $imageName);
         }
     }
