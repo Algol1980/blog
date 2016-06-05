@@ -116,7 +116,7 @@ function listPosts($userId) {
             $line = fgets($file);
             if ($line) {
                 $line = json_decode($line, true);
-                array_push($userPosts, $line);
+                array_unshift($userPosts, $line);
             }
         }
         fclose($file);
