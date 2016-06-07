@@ -1,11 +1,16 @@
 <?php
 session_start();
 require 'functions.php';
-
-if (isset($_SESSION['user']) && isset($_SESSION['userId'])) {
-    $userPosts = listPosts($_SESSION['userId']);
-
+if (!isset($_GET['userId'])) {
+    header("Location: index.php");
+} 
+else {
+    $userPosts = listPosts($_GET['userId']);
 }
+//if (isset($_SESSION['user']) && isset($_SESSION['userId'])) {
+//    $userPosts = listPosts($_SESSION['userId']);
+//
+//}
 
 require 'header.php';
 ?>

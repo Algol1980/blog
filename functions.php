@@ -104,23 +104,68 @@ function addPost($userId, $title, $content, $filePath = false)
     }
 }
 
-function listPosts($userId) {
+function listPosts($userId, $page=1) {
+    $postsPerPage = 20;
+    $shift = ($page - 1) * $postsPerPage;
     $userPosts = [];
     $filePath = 'db/' . $userId . '.db';
     $file = fopen($filePath, 'r');
+       for($i=0; $i < $shift; $i++) {
+           fgets($file);
+       }
+    $counter = 0;
     if (!$file) {
         return false;
     }
     else {
-        while (!feof($file)) {
+        while (!feof($file) && $counter < $postsPerPage) {
             $line = fgets($file);
+            $counter++;
             if ($line) {
                 $line = json_decode($line, true);
-                array_unshift($userPosts, $line);
+                array_shift($userPosts, $line);
             }
         }
         fclose($file);
         return $userPosts;
     }
 
+}
+
+function getUserById($userId) {
+    $userDb = fopen('db/users.db', 'r+');
+    if (!$userDb) {
+        return FALSE;
+    } else {
+        while (!feof($userDb)) {
+            if ($line = fgets($userDb)) {
+                $user = json_decode($line, true);
+                if ($userId == $line['userId']) {
+                    fclose($userDb);
+                    return $user;
+                }
+             }
+        }
+        fclose($userDb);
+        return false;
+    
+}
+}
+
+function getPostCountByUserId ($userId) {
+    $filePath = 'db/' . $userId . '.db';
+    $file = fopen($filePath, 'r');
+    $counter++;
+    if (!$file) {
+        return false;
+    }
+    else {
+        while (!feof($file)) {
+            if($line = fgets($file)) {
+            $counter++;
+                    }
+        fclose($file);
+        return $counter;
+    }
+}
 }
