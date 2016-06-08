@@ -1,5 +1,6 @@
 <?php
 session_start();
+require 'functions.php';
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,12 +10,14 @@ require 'header.php';
 ?>
 
 <div class="container">
-
+    <?php if(!isset($_SESSION['user'])): ?>
     <div class="jumbotron">
         <h1>Introduce cool blog system!</h1>
         <p>It's very cool and fun, try it!</p>
         <p><a class="btn btn-primary" href="signup.php">Start using!</a> or <a href="login.php" class="btn btn-primary">Log in</a></p>
     </div>
+    <?php endif ?>
+
 
     <h2>List of bloggers</h2>
     <table class="table table-bordered table-striped">
@@ -25,40 +28,21 @@ require 'header.php';
                 <th>Количество фото</th>
             </tr>
         </thead>
+        <?php $bloggers = getBloggers(); ?>
+        <?php foreach($bloggers as $blogger): ?>
         <tbody>
             <tr>
                 <td>
-                    <a href="blog.php">Андрей Петров</a>
+                    <a href="blog.php?userId=<?php echo $blogger['userId']?>"><?php echo $blogger['name']?></a>
                 </td>
                 <td>
-                    2
+                    <?php echo $blogger['images']?>
                 </td>
                 <td>
-                    1
+                    <?php echo $blogger['posts']?>
                 </td>
             </tr>
-            <tr>
-                <td>
-                    <a href="blog.php">Петр Андреев</a>
-                </td>
-                <td>
-                    2
-                </td>
-                <td>
-                    1
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a href="blog.php">Михаил Горький</a>
-                </td>
-                <td>
-                    2
-                </td>
-                <td>
-                    1
-                </td>
-            </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 

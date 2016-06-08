@@ -53,9 +53,12 @@ $rightScripts = ['blog.php', 'photos.php', 'posts.php'];
                     <li><a href="photos.php?userId=<?php echo $currentUser['userId'] ?>">Photos</a></li>
                 <?php } ?>
             </ul>
-            <form class="navbar-form navbar-left" role="search">
+            <form class="navbar-form navbar-left" role="search" method="get" action="search.php">
                 <div class="form-group">
                     <!--<input type="text" class="form-control" placeholder="Search">-->
+                    <?php if(isset($currentUser)):  ?>
+                        <input type="hidden" value="<?php echo $currentUser['userId']; ?>" name="userId">
+                    <?php endif ?>
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search for...">
       <span class="input-group-btn">

@@ -5,7 +5,7 @@ require 'functions.php';
 if (!empty($_POST)) {
     if(!empty($_POST['title']) && !empty($_POST['content'])) {
         if(addPost($_SESSION['userId'], $_POST['title'], $_POST['content'], $_FILES['image']['tmp_name'])) {
-            header("Location: blog.php");
+            header("Location: blog.php?userId={$_SESSION['userId']}");
         }
     }
 
