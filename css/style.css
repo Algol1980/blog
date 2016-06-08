@@ -15,3 +15,14 @@
     max-width: 400px;
     margin: 0 auto;
 }
+
+.photo img {
+    max-height: 150px;
+    max-width: 150px;
+}
+
+.photo {
+    float: left;
+    margin-right:5px;
+    margin-bottom:5px;
+}

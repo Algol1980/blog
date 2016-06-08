@@ -5,7 +5,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
+$rightScripts = ['blog.php', 'photos.php', 'posts.php'];
 ?> 
 
 
@@ -32,7 +32,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="index.php">
-                <?php if (isset($_GET['userId']) && basename($_SERVER['SCRIPT_NAME']) == 'blog.php') {
+                <?php if (isset($_GET['userId']) && in_array(basename($_SERVER['SCRIPT_NAME']), $rightScripts)) {
                     if ($currentUser = getUserById($_GET['userId'])) {
                         echo $currentUser['firstName'] . " " . $currentUser['lastName'];
                     }

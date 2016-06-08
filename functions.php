@@ -202,6 +202,7 @@ function makeButton($page, $isActive = true, $text = null)
     return $btn;
 }
 
+
 function getPhotosCount($userId) {
         $filePath = 'db/' . $userId . '.db';
         $file = fopen($filePath, 'r');
@@ -211,6 +212,7 @@ function getPhotosCount($userId) {
         } else {
             while (!feof($file)) {
                 if ($line = fgets($file)) {
+                    $line = json_decode($line, true);
                     if($line['image']) {
                         $counter++;
                     }
@@ -221,4 +223,36 @@ function getPhotosCount($userId) {
             fclose($file);
             return $counter;
         }
+}
+
+
+function getPhotosByUser($userId, $imagesPerPage, $page = 1)
+{
+
+    $shift = ($page - 1) * $imagesPerPage;
+    $userImages = [];
+    $filePath = 'db/' . $userId . '.db';
+    $file = fopen($filePath, 'r');
+    for ($i = 0; $i < $shift; $i++) {
+        fgets($file);
+    }
+    $counter = 0;
+    if (!$file) {
+        return false;
+    } else {
+        while (!feof($file) && $counter < $imagesPerPage) {
+            $line = fgets($file);
+            if ($line) {
+                $line = json_decode($line, true);
+                if($line['image']) {
+                    array_push($userImages, $line['image']);
+                    $counter++;
+                }
+
+            }
+        }
+        fclose($file);
+        return $userImages;
+    }
+
 }

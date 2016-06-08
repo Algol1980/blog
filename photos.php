@@ -1,69 +1,60 @@
 <?php
-require "functions.php";
 session_start();
-require "header.php";
+require 'functions.php';
+$imagesPerPage = 5;
+
+
+if (isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0) {
+    $currentPage = $_GET['page'];
+
+} else {
+    $currentPage = 1;
+}
+
+if (!isset($_GET['userId'])) {
+    header("Location: index.php");
+} else {
+    $userImages = getPhotosByUser($_GET['userId'], $imagesPerPage, $currentPage);
+}
+if ($totalImages = getPhotosCount($_GET['userId'])) {
+    $totalImagePages = ceil($totalImages / $imagesPerPage);
+}
+
+
+require 'header.php';
+?>
 
 ?>
 
 <div class="container">
-
-    <div class="photo">
-        <img src="img/dog.jpg" />
-    </div>
-
-    <div class="photo">
-        <img src="img/dog.jpg" />
-    </div>
-
-    <div class="photo">
-        <img src="img/dog.jpg" />
-    </div>
-
-    <div class="photo">
-        <img src="img/dog.jpg" />
-    </div>
-
-    <div class="photo">
-        <img src="img/dog.jpg" />
-    </div>
-
-    <div class="photo">
-        <img src="img/dog.jpg" />
-    </div>
-
-    <div class="photo">
-        <img src="img/dog.jpg" />
-    </div>
-
-    <div class="photo">
-        <img src="img/dog.jpg" />
-    </div>
-
-    <div class="photo">
-        <img src="img/dog.jpg" />
-    </div>
-
+    <?php if ($userImages) {
+        foreach ($userImages as $value) { ?>
+            <div class="photo">
+                <img src="<?php echo 'img/' . $value; ?>"/>
+            </div>
+        <?php }
+    } ?>
     <div class="clearfix clear"></div>
 
 
     <nav>
-        <ul class="pagination">
-            <li>
-                <a href="#" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            <li><a href="#">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#">4</a></li>
-            <li><a href="#">5</a></li>
-            <li>
-                <a href="#" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
+        <?php if ($pagination = renderPagination($totalImagePages, $currentPage)) { ?>
+            <ul class="pagination">
+                <?php foreach ($pagination as $value) {
+                    if ($value['isActive']) { ?>
+                        <li>
+                            <a href="<?php echo '?userId=' . $_GET['userId'] . '&page=' . $value['page'] ?>">
+                                <span aria-hidden="true"><?php echo $value['text']; ?></span>
+                            </a>
+                        </li>
+                    <?php } else { ?>
+                        <li class="disabled">
+                            <span aria-hidden="true"><?php echo $value['text']; ?></span>
+                        </li>
+                    <?php }
+                } ?>
+            </ul>
+        <?php } ?>
     </nav>
 
 </div>
