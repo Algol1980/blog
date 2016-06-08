@@ -80,50 +80,48 @@ function addPost($userId, $title, $content, $filePath = false)
     $userDb = fopen('db/' . $userId . '.db', 'a+');
     if (!$userDb) {
         return false;
-    }
-    else {
-    if ($filePath && is_uploaded_file($filePath)) {
-        //TODO: check image (getimagesize) - Realized
-        $types = ['image/gif' => 'gif', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
-        $imgInfo = getimagesize($filePath);
-        if ($imgInfo && array_key_exists($imgInfo['mime'], $types)) {
-            $imageName = 'img_' . time() . '.' . $types[$imgInfo['mime']];
-            move_uploaded_file($filePath, 'img/' . $imageName);
+    } else {
+        if ($filePath && is_uploaded_file($filePath)) {
+            //TODO: check image (getimagesize) - Realized
+            $types = ['image/gif' => 'gif', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
+            $imgInfo = getimagesize($filePath);
+            if ($imgInfo && array_key_exists($imgInfo['mime'], $types)) {
+                $imageName = 'img_' . time() . '.' . $types[$imgInfo['mime']];
+                move_uploaded_file($filePath, 'img/' . $imageName);
+            }
         }
-    }
 
-    fwrite($userDb, json_encode([
-        'title' => $title,
-        'content' => $content,
-        'createdAt' => date("d.m.Y H:i:s"),
-        'image' => $imageName
-    ]) . PHP_EOL);
+        fwrite($userDb, json_encode([
+                'title' => $title,
+                'content' => $content,
+                'createdAt' => date("d.m.Y H:i:s"),
+                'image' => $imageName
+            ]) . PHP_EOL);
 
-    fclose($userDb);
-    return true;
+        fclose($userDb);
+        return true;
     }
 }
 
-function listPosts($userId, $page=1) {
-    $postsPerPage = 20;
+function listPosts($userId, $postsPerPage, $page = 1)
+{
     $shift = ($page - 1) * $postsPerPage;
     $userPosts = [];
     $filePath = 'db/' . $userId . '.db';
     $file = fopen($filePath, 'r');
-       for($i=0; $i < $shift; $i++) {
-           fgets($file);
-       }
+    for ($i = 0; $i < $shift; $i++) {
+        fgets($file);
+    }
     $counter = 0;
     if (!$file) {
         return false;
-    }
-    else {
+    } else {
         while (!feof($file) && $counter < $postsPerPage) {
             $line = fgets($file);
             $counter++;
             if ($line) {
                 $line = json_decode($line, true);
-                array_shift($userPosts, $line);
+                array_push($userPosts, $line);
             }
         }
         fclose($file);
@@ -132,40 +130,95 @@ function listPosts($userId, $page=1) {
 
 }
 
-function getUserById($userId) {
+function getUserById($userId)
+{
     $userDb = fopen('db/users.db', 'r+');
     if (!$userDb) {
-        return FALSE;
-    } else {
-        while (!feof($userDb)) {
-            if ($line = fgets($userDb)) {
-                $user = json_decode($line, true);
-                if ($userId == $line['userId']) {
-                    fclose($userDb);
-                    return $user;
-                }
-             }
-        }
-        fclose($userDb);
-        return false;
-    
-}
-}
-
-function getPostCountByUserId ($userId) {
-    $filePath = 'db/' . $userId . '.db';
-    $file = fopen($filePath, 'r');
-    $counter++;
-    if (!$file) {
         return false;
     }
-    else {
+    while (!feof($userDb)) {
+        if ($user = fgets($userDb)) {
+            $user = json_decode($user, true);
+            if ($userId == $user['userId']) {
+                fclose($userDb);
+                return $user;
+            }
+        }
+    }
+}
+
+function getPostCountByUserId($userId)
+{
+
+    $filePath = 'db/' . $userId . '.db';
+    $file = fopen($filePath, 'r');
+    $counter = 0;
+    if (!$file) {
+        return false;
+    } else {
         while (!feof($file)) {
-            if($line = fgets($file)) {
-            $counter++;
-                    }
+            if ($line = fgets($file)) {
+                $counter++;
+            }
+
+        }
         fclose($file);
         return $counter;
     }
 }
+
+function renderPagination($totalPages, $currentPage)
+{
+
+    if (!$currentPage) {
+        return false;
+    }
+    if ($totalPages == 1) {
+        return false;
+    }
+
+    if ($currentPage > $totalPages) {
+        $currentPage = $totalPages;
+    }
+    $buttons = [];
+    $buttons[] = makeButton($currentPage - 1, $currentPage > 1, '«');
+    $i = 1;
+    while($i <= $totalPages) {
+        $isActive = $currentPage != $i;
+        $buttons[] = makeButton($i, $isActive);
+        $i++;
+    }
+    $buttons[] = makeButton($currentPage + 1, $currentPage < $totalPages, '»');
+
+    return $buttons;
+}
+
+function makeButton($page, $isActive = true, $text = null)
+{
+    $btn = [];
+    $btn['page'] = $page;
+    $btn['isActive'] = $isActive;
+    $btn['text'] = is_null($text) ? $page : $text;
+    return $btn;
+}
+
+function getPhotosCount($userId) {
+        $filePath = 'db/' . $userId . '.db';
+        $file = fopen($filePath, 'r');
+        $counter = 0;
+        if (!$file) {
+            return false;
+        } else {
+            while (!feof($file)) {
+                if ($line = fgets($file)) {
+                    if($line['image']) {
+                        $counter++;
+                    }
+
+                }
+
+            }
+            fclose($file);
+            return $counter;
+        }
 }

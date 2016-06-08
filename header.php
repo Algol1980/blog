@@ -31,14 +31,27 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Blog System</a>
+            <a class="navbar-brand" href="index.php">
+                <?php if (isset($_GET['userId']) && basename($_SERVER['SCRIPT_NAME']) == 'blog.php') {
+                    if ($currentUser = getUserById($_GET['userId'])) {
+                        echo $currentUser['firstName'] . " " . $currentUser['lastName'];
+                    }
+                }
+                else {
+                    echo 'Blog System';
+                }
+                ?>
+            </a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <!--<li class="active"><a href="#">Posts <span class="sr-only">(current)</span></a></li>-->
-                <!--<li><a href="#">Photos</a></li>-->
+                <?php if(isset($currentUser)) { ?>
+                    <?php //TODO: implement active li ?>
+                    <li><a href="blog.php?userId=<?php echo $currentUser['userId'] ?>">Posts <span class="sr-only">(current)</span></a></li>
+                    <li><a href="photos.php?userId=<?php echo $currentUser['userId'] ?>">Photos</a></li>
+                <?php } ?>
             </ul>
             <form class="navbar-form navbar-left" role="search">
                 <div class="form-group">
@@ -58,7 +71,7 @@
                 <li><a href="signup.php">Sign up</a></li>
                 <?php } else { ?>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <a href="blog.php?userId=<?php echo isset($_SESSION['userId']) ? $_SESSION['userId'] : ''; ?>" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                     <?php echo $_SESSION['firstName'] . " " . $_SESSION['lastName']; ?>
                         <span class="caret"></span></a>
                     <ul class="dropdown-menu">
