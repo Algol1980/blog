@@ -309,7 +309,7 @@ function getBloggers()
     return $result;
 }
 
-function searchByUser($userId, $search, $page = 1)
+function searchByUser($userId, $postsPerPage, $search, $page = 1)
 {
     $postsPerPage = 5;
     $shift = ($page - 1) * $postsPerPage;
@@ -346,4 +346,33 @@ function searchByUser($userId, $search, $page = 1)
     }
     return $userPosts;
 
+}
+
+
+function getSearchPostCount($userId, $search)
+{
+    $counter = 0;
+    $filePath = 'db/' . $userId . '.db';
+    if (file_exists($filePath)) {
+        $file = fopen($filePath, 'r');
+
+        if (!$file) {
+            return $counter;
+        } else {
+            while (!feof($file)) {
+                if ($line = fgets($file)) {
+                    $line = json_decode($line, true);
+                    if (stripos($line['title'], $search) !== false ||
+                        stripos($line['content'], $search) !== false
+                    ) {
+                        $counter++;
+                    }
+
+                }
+
+            }
+            fclose($file);
+            return $counter;
+        }
+    }
 }

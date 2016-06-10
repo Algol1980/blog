@@ -5,7 +5,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-$rightScripts = ['blog.php', 'photos.php', 'posts.php'];
+$rightScripts = ['blog.php', 'photos.php', 'posts.php', 'search.php'];
 ?> 
 
 

@@ -2,11 +2,27 @@
 session_start();
 require 'functions.php';
 require 'header.php';
+$postsPerPage = 5;
+
+if (isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0) {
+    $currentPage = $_GET['page'];
+
+} else {
+    $currentPage = 1;
+}
+
+if (!isset($_GET['userId'])) {
+    header("Location: index.php");
+}
+if ($totalSearchResults = getSearchPostCount($_GET['userId'], $_GET['search'])) {
+    $totalSearchPages = ceil($totalSearchResults / $postsPerPage);
+}
+
 
 ?>
 <div class="container">
     <?php if (isset($_GET['userId']) && isset($_GET['search'])):
-        $posts = searchByUser($_GET['userId'], $_GET['search'], $_GET['page']);
+        $posts = searchByUser($_GET['userId'], $postsPerPage, $_GET['search'], $_GET['page']);
         foreach ($posts as $post): ?>
 
             <div class="post">
@@ -24,23 +40,23 @@ require 'header.php';
     <?php endif ?>
 
     <nav>
-        <ul class="pagination">
-            <li>
-                <a href="#" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            <li><a href="#">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#">4</a></li>
-            <li><a href="#">5</a></li>
-            <li>
-                <a href="#" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
+        <?php if ($pagination = renderPagination($totalSearchPages, $currentPage)) { ?>
+            <ul class="pagination">
+                <?php foreach ($pagination as $value) {
+                    if ($value['isActive']) { ?>
+                        <li>
+                            <a href="<?php echo '?userId=' . $_GET['userId'] . '&page=' . $value['page'] . '&search=' . $_GET['search']?>">
+                                <span aria-hidden="true"><?php echo $value['text']; ?></span>
+                            </a>
+                        </li>
+                    <?php } else { ?>
+                        <li class="disabled">
+                            <span aria-hidden="true"><?php echo $value['text']; ?></span>
+                        </li>
+                    <?php }
+                } ?>
+            </ul>
+        <?php } ?>
     </nav>
 
 </div>
