@@ -49,8 +49,8 @@ $rightScripts = ['blog.php', 'photos.php', 'posts.php'];
             <ul class="nav navbar-nav">
                 <?php if(isset($currentUser)) { ?>
                     <?php //TODO: implement active li ?>
-                    <li><a href="blog.php?userId=<?php echo $currentUser['userId'] ?>">Posts <span class="sr-only">(current)</span></a></li>
-                    <li><a href="photos.php?userId=<?php echo $currentUser['userId'] ?>">Photos</a></li>
+                    <li <?php echo (basename($_SERVER['SCRIPT_NAME']) == 'blog.php') ? 'class="active"' : ''; ?>><a href="blog.php?userId=<?php echo $currentUser['userId'] ?>">Posts <span class="sr-only">(current)</span></a></li>
+                    <li <?php echo (basename($_SERVER['SCRIPT_NAME']) == 'photos.php') ? 'class="active"' : ''; ?>><a href="photos.php?userId=<?php echo $currentUser['userId'] ?>">Photos</a></li>
                 <?php } ?>
             </ul>
             <form class="navbar-form navbar-left" role="search" method="get" action="search.php">
@@ -60,7 +60,7 @@ $rightScripts = ['blog.php', 'photos.php', 'posts.php'];
                         <input type="hidden" value="<?php echo $currentUser['userId']; ?>" name="userId">
                     <?php endif ?>
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for...">
+                        <input type="text" class="form-control" name='search' placeholder="Search for...">
       <span class="input-group-btn">
         <button class="btn btn-default" type="button">Go!</button>
       </span>

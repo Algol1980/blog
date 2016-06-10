@@ -10,13 +10,13 @@ require 'header.php';
 ?>
 
 <div class="container">
-    <?php if(!isset($_SESSION['user'])): ?>
     <div class="jumbotron">
         <h1>Introduce cool blog system!</h1>
         <p>It's very cool and fun, try it!</p>
+        <?php if(!isset($_SESSION['user'])): ?>
         <p><a class="btn btn-primary" href="signup.php">Start using!</a> or <a href="login.php" class="btn btn-primary">Log in</a></p>
+        <?php endif ?>
     </div>
-    <?php endif ?>
 
 
     <h2>List of bloggers</h2>
@@ -24,8 +24,8 @@ require 'header.php';
         <thead>
             <tr>
                 <th>Имя</th>
-                <th>Количество записей</th>
                 <th>Количество фото</th>
+                <th>Количество записей</th>
             </tr>
         </thead>
         <?php $bloggers = getBloggers(); ?>
