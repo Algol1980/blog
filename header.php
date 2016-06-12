@@ -78,7 +78,7 @@ $rightScripts = ['blog.php', 'photos.php', 'posts.php', 'search.php'];
                     <?php echo $_SESSION['firstName'] . " " . $_SESSION['lastName']; ?>
                         <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="add-post.php">Add post</a></li>
+                        <li <?php echo (basename($_SERVER['SCRIPT_NAME']) == 'add-post.php') ? 'class="active"' : ''; ?> ><a href="add-post.php">Add post</a></li>
                         <li><a href="#">Edit profile</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="logout.php">Logout</a></li>

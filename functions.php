@@ -311,14 +311,14 @@ function getBloggers()
 
 function searchByUser($userId, $postsPerPage, $search, $page = 1)
 {
-    $postsPerPage = 5;
     $shift = ($page - 1) * $postsPerPage;
     $userPosts = [];
     $filePath = 'db/' . $userId . '.db';
 
     if (file_exists($filePath)) {
         $file = fopen($filePath, 'r');
-        for ($i = 0; $i < $shift;) {
+        $i = 0;
+        while (!feof($file) && $i < $shift) {
             if ($line = fgets($file)) {
                 $post = json_decode($line, true);
                 if (
@@ -373,6 +373,129 @@ function getSearchPostCount($userId, $search)
             }
             fclose($file);
             return $counter;
+        }
+    }
+}
+
+function totalSearchPosts($search, $postsPerPage, $page = 1)
+{
+    $filePath = 'db/users.db';
+    $result = [];
+    $shift = ($page - 1) * $postsPerPage;
+    if (file_exists($filePath)) {
+        $file = fopen($filePath, 'r');
+        if (!$file) {
+            return false;
+        } else {
+            while (!feof($file)) {
+                if ($line = fgets($file)) {
+                    $line = json_decode($line, true);
+                    if ($posts = searchPosts($line['userId'], $postsPerPage, $search, $shift)) {
+                        $result[$line['userId']] = $posts[0];
+                        $shift = $posts[1];
+                        if (count($posts) < $postsPerPage) {
+                            $postsPerPage -= count($posts[0]);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+            fclose($file);
+            return $result;
+        }
+
+    }
+}
+
+function totalSearchPostCount($search)
+{
+    $counter = 0;
+    $filePath = 'db/users.db';
+    if (file_exists($filePath)) {
+        $file = fopen($filePath, 'r');
+        if (!$file) {
+            return $counter;
+        } else {
+            while (!feof($file)) {
+                if ($line = fgets($file)) {
+                    $line = json_decode($line, true);
+                    $counter += getSearchPostCount($line['userId'], $search);
+                }
+            }
+            fclose($file);
+            return $counter;
+        }
+    }
+}
+
+
+function searchPosts($userId, $postsPerPage, $search, $shift)
+{
+
+    $userPosts = [];
+    $filePath = 'db/' . $userId . '.db';
+
+    if (file_exists($filePath)) {
+        $file = fopen($filePath, 'r');
+
+        while (!feof($file) && $shift > 0) {
+            if ($line = fgets($file)) {
+                $post = json_decode($line, true);
+                if (
+                    stripos($post['title'], $search) !== false ||
+                    stripos($post['content'], $search) !== false
+                ) {
+                    $shift--;
+                }
+            }
+        }
+        $counter = 0;
+        while (!feof($file) && $counter < $postsPerPage) {
+            $line = fgets($file);
+            if ($line) {
+                $line = json_decode($line, true);
+                if (stripos($line['title'], $search) !== false ||
+                    stripos($line['content'], $search) !== false
+                ) {
+                    $userPosts[] = $line;
+                    $counter++;
+                }
+            }
+        }
+        fclose($file);
+    }
+    return [$userPosts, $shift];
+
+}
+
+function getPostPosition($userId, $post)
+{
+    $counter = 1;
+    $filePath = 'db/' . $userId . '.db';
+    if (file_exists($filePath)) {
+        $file = fopen($filePath, 'r');
+
+        if (!$file) {
+            return $counter;
+        } else {
+            while (!feof($file)) {
+                if ($line = fgets($file)) {
+                    $line = json_decode($line, true);
+                    if ($line != $post) {
+                        $counter++;
+                    }
+                    else {
+                        fclose($file);
+                        return $counter;
+                    }
+
+                }
+
+            }
+            fclose($file);
+            return false;
+
         }
     }
 }

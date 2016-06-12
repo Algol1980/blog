@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'functions.php';
-$postsPerPage = 4;
+$postsPerPage = 5;
 
 if (isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0) {
     $currentPage = $_GET['page'];
