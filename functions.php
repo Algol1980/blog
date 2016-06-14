@@ -34,44 +34,50 @@ function addUser($email, $firstName, $lastName, $password)
 
 function isUserExist($email)
 {
-    $userDb = fopen('db/users.db', 'r+');
-    if (!$userDb) {
-        return FALSE;
-    } else {
-        while (!feof($userDb)) {
-            $line = fgets($userDb);
-            if ($line) {
-                $line = json_decode($line, true);
-                if ($email == $line['email']) {
-                    fclose($userDb);
-                    return $line;
+    $filePath = 'db/users.db';
+    if (file_exists($filePath)) {
+        $userDb = fopen('db/users.db', 'r+');
+        if (!$userDb) {
+            return FALSE;
+        } else {
+            while (!feof($userDb)) {
+                $line = fgets($userDb);
+                if ($line) {
+                    $line = json_decode($line, true);
+                    if ($email == $line['email']) {
+                        fclose($userDb);
+                        return $line;
+                    }
                 }
             }
+            fclose($userDb);
+            return false;
         }
-        fclose($userDb);
-        return false;
     }
 }
 
 function checkUser($email, $password)
 {
     $password = sha1($password);
-    $userDb = fopen('db/users.db', 'r');
-    if (!$userDb) {
-        return false;
-    } else {
-        while (!feof($userDb)) {
-            $line = fgets($userDb);
-            if ($line) {
-                $line = json_decode($line, true);
-                if ($email == $line['email'] && $password == $line['password']) {
-                    fclose($userDb);
-                    return $line;
+    $filePath = 'db/users.db';
+    if (file_exists($filePath)) {
+        $userDb = fopen($filePath, 'r');
+        if (!$userDb) {
+            return false;
+        } else {
+            while (!feof($userDb)) {
+                $line = fgets($userDb);
+                if ($line) {
+                    $line = json_decode($line, true);
+                    if ($email == $line['email'] && $password == $line['password']) {
+                        fclose($userDb);
+                        return $line;
+                    }
                 }
             }
+            fclose($userDb);
+            return false;
         }
-        fclose($userDb);
-        return false;
     }
 }
 
@@ -101,15 +107,18 @@ function addPost($userId, $title, $content, $filePath = false)
             'image' => $imageName
         ]) . PHP_EOL);
 
-    $oldUserDb = "db/$userId.db";
-    if (file_exists($oldUserDb)) {
-        $oldUserDb = fopen($oldUserDb, "r");
+    $oldDb = "db/$userId.db";
+    if (file_exists($oldDb)) {
+        $oldUserDb = fopen($oldDb, "r");
 
         while (!feof($oldUserDb)) {
             $line = fgets($oldUserDb);
             fwrite($userDb, $line);
         }
         fclose($userDb);
+    }
+    else {
+        $oldUserDb = fopen($oldDb, "a+");
     }
     fclose($oldUserDb);
 
@@ -288,28 +297,31 @@ function getPhotosByUser($userId, $imagesPerPage, $page = 1)
 
 function getBloggers()
 {
-    $userDb = fopen('db/users.db', 'r');
-    $result = [];
-    $i = 0;
-    if (!$userDb) {
-        return false;
-    }
-    while (!feof($userDb) && $i < 20) {
-
-        $line = fgets($userDb);
-        if ($line) {
-            $line = json_decode($line, true);
-            $result[] = [
-                'userId' => $line['userId'],
-                'name' => $line['firstName'] . ' ' . $line['lastName'],
-                'posts' => getPostCountByUserId($line['userId']),
-                'images' => getPhotosCount($line['userId'])
-            ];
+    $filePath = 'db/users.db';
+    if (file_exists($filePath)) {
+        $userDb = fopen($filePath, 'r');
+        $result = [];
+        $i = 0;
+        if (!$userDb) {
+            return false;
         }
-        $i++;
+        while (!feof($userDb) && $i < 20) {
+
+            $line = fgets($userDb);
+            if ($line) {
+                $line = json_decode($line, true);
+                $result[] = [
+                    'userId' => $line['userId'],
+                    'name' => $line['firstName'] . ' ' . $line['lastName'],
+                    'posts' => getPostCountByUserId($line['userId']),
+                    'images' => getPhotosCount($line['userId'])
+                ];
+            }
+            $i++;
+        }
+        fclose($userDb);
+        return $result;
     }
-    fclose($userDb);
-    return $result;
 }
 
 function searchByUser($userId, $postsPerPage, $search, $page = 1)
