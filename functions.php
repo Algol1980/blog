@@ -83,36 +83,38 @@ function addPost($userId, $title, $content, $filePath = false)
 
     if (!$userDb) {
         return false;
-    } else {
-        if ($filePath && is_uploaded_file($filePath)) {
-            //TODO: check image (getimagesize) - Realized
-            $types = ['image/gif' => 'gif', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
-            $imgInfo = getimagesize($filePath);
-            if ($imgInfo && array_key_exists($imgInfo['mime'], $types)) {
-                $imageName = 'img_' . time() . '.' . $types[$imgInfo['mime']];
-                move_uploaded_file($filePath, 'img/' . $imageName);
-            }
+    }
+    if ($filePath && is_uploaded_file($filePath)) {
+        //TODO: check image (getimagesize) - Realized
+        $types = ['image/gif' => 'gif', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
+        $imgInfo = getimagesize($filePath);
+        if ($imgInfo && array_key_exists($imgInfo['mime'], $types)) {
+            $imageName = 'img_' . time() . '.' . $types[$imgInfo['mime']];
+            move_uploaded_file($filePath, 'img/' . $imageName);
         }
+    }
 
-        fwrite($userDb, json_encode([
-                'title' => $title,
-                'content' => $content,
-                'createdAt' => date("d.m.Y H:i:s"),
-                'image' => $imageName
-            ]) . PHP_EOL);
+    fwrite($userDb, json_encode([
+            'title' => $title,
+            'content' => $content,
+            'createdAt' => date("d.m.Y H:i:s"),
+            'image' => $imageName
+        ]) . PHP_EOL);
 
-        $oldUserDb = fopen('db/' . $userId . '.db', 'a+');
+    $oldUserDb = "db/$userId.db";
+    if (file_exists($oldUserDb)) {
+        $oldUserDb = fopen($oldUserDb, "r");
 
         while (!feof($oldUserDb)) {
             $line = fgets($oldUserDb);
             fwrite($userDb, $line);
         }
-
         fclose($userDb);
-        fclose($oldUserDb);
-        rename($path, $userDb);
-        return true;
     }
+    fclose($oldUserDb);
+
+    rename($path, "db/$userId.db");
+    return true;
 }
 
 function listPosts($userId, $postsPerPage, $page = 1)
@@ -485,8 +487,7 @@ function getPostPosition($userId, $post)
                     $line = json_decode($line, true);
                     if ($line != $post) {
                         $counter++;
-                    }
-                    else {
+                    } else {
                         fclose($file);
                         return $counter;
                     }
