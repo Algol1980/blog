@@ -16,7 +16,7 @@ if (!isset($_GET['userId'])) {
     $userPosts = listPosts($_GET['userId'], $postsPerPage, $currentPage);
 }
 if ($totalPosts = getPostCountByUserId($_GET['userId'])) {
-    $totalPages = ceil( $totalPosts/ $postsPerPage);
+    $totalPages = ceil($totalPosts/ $postsPerPage);
 }
 
 

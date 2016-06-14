@@ -120,26 +120,27 @@ function listPosts($userId, $postsPerPage, $page = 1)
     $shift = ($page - 1) * $postsPerPage;
     $userPosts = [];
     $filePath = 'db/' . $userId . '.db';
-    $file = fopen($filePath, 'r');
-    for ($i = 0; $i < $shift; $i++) {
-        fgets($file);
-    }
-    $counter = 0;
-    if (!$file) {
-        return false;
-    } else {
-        while (!feof($file) && $counter < $postsPerPage) {
-            $line = fgets($file);
-            $counter++;
-            if ($line) {
-                $line = json_decode($line, true);
-                array_push($userPosts, $line);
-            }
+    if (file_exists($filePath)) {
+        $file = fopen($filePath, 'r');
+        for ($i = 0; $i < $shift; $i++) {
+            fgets($file);
         }
-        fclose($file);
-        return $userPosts;
+        $counter = 0;
+        if (!$file) {
+            return false;
+        } else {
+            while (!feof($file) && $counter < $postsPerPage) {
+                $line = fgets($file);
+                $counter++;
+                if ($line) {
+                    $line = json_decode($line, true);
+                    array_push($userPosts, $line);
+                }
+            }
+            fclose($file);
+            return $userPosts;
+        }
     }
-
 }
 
 function getUserById($userId)
