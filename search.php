@@ -10,11 +10,13 @@ if (isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0) {
 } else {
     $currentPage = 1;
 }
+$searchArray = splitSearch($_GET['search']);
 
 if (!isset($_GET['userId'])) {
-    $totalSearchResults = totalSearchPostCount($_GET['search']);
+
+    $totalSearchResults = totalSearchPostCount($searchArray);
     $totalSearchPages = ceil($totalSearchResults / $postsPerPage);
-} elseif ($totalSearchResults = getSearchPostCount($_GET['userId'], $_GET['search'])) {
+} elseif ($totalSearchResults = getSearchPostCount($_GET['userId'], $searchArray)) {
     $totalSearchPages = ceil($totalSearchResults / $postsPerPage);
 }
 
@@ -22,7 +24,7 @@ require 'header.php';
 ?>
     <div class="container">
         <?php if (isset($_GET['userId']) && isset($_GET['search'])):
-            $posts = searchByUser($_GET['userId'], $postsPerPage, $_GET['search'], $_GET['page']);
+            $posts = searchByUser($_GET['userId'], $postsPerPage, $searchArray, $_GET['page']);
             foreach ($posts as $post): ?>
 
                 <div class="post">
@@ -42,7 +44,7 @@ require 'header.php';
                 </div>
             <?php endforeach ?>
         <?php else:
-            $posts = totalSearchPosts($_GET['search'], $postsPerPage, $_GET['page']);
+            $posts = totalSearchPosts($searchArray, $postsPerPage, $_GET['page']);
             foreach ($posts as $key => $blog):
                 foreach ($blog as $post):?>
 

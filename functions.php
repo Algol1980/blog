@@ -116,8 +116,7 @@ function addPost($userId, $title, $content, $filePath = false)
             fwrite($userDb, $line);
         }
         fclose($userDb);
-    }
-    else {
+    } else {
         $oldUserDb = fopen($oldDb, "a+");
     }
     fclose($oldUserDb);
@@ -336,11 +335,14 @@ function searchByUser($userId, $postsPerPage, $search, $page = 1)
         while (!feof($file) && $i < $shift) {
             if ($line = fgets($file)) {
                 $post = json_decode($line, true);
-                if (
-                    stripos($post['title'], $search) !== false ||
-                    stripos($post['content'], $search) !== false
-                ) {
-                    $i++;
+                foreach ($search as $word) {
+                    if (
+                        stripos($post['title'], $word) !== false ||
+                        stripos($post['content'], $word) !== false
+                    ) {
+                        $i++;
+
+                    }
                 }
             }
         }
@@ -349,11 +351,13 @@ function searchByUser($userId, $postsPerPage, $search, $page = 1)
             $line = fgets($file);
             if ($line) {
                 $line = json_decode($line, true);
-                if (stripos($line['title'], $search) !== false ||
-                    stripos($line['content'], $search) !== false
-                ) {
-                    $userPosts[] = $line;
-                    $counter++;
+                foreach ($search as $word) {
+                    if (stripos($line['title'], $word) !== false ||
+                        stripos($line['content'], $word) !== false
+                    ) {
+                        $userPosts[] = $line;
+                        $counter++;
+                    }
                 }
             }
         }
@@ -377,11 +381,14 @@ function getSearchPostCount($userId, $search)
             while (!feof($file)) {
                 if ($line = fgets($file)) {
                     $line = json_decode($line, true);
-                    if (stripos($line['title'], $search) !== false ||
-                        stripos($line['content'], $search) !== false
-                    ) {
-                        $counter++;
+                    foreach ($search as $word) {
+                        if (stripos($line['title'], $word) !== false ||
+                            stripos($line['content'], $word) !== false
+                        ) {
+                            $counter++;
+                        }
                     }
+
 
                 }
 
@@ -434,8 +441,10 @@ function totalSearchPostCount($search)
         } else {
             while (!feof($file)) {
                 if ($line = fgets($file)) {
-                    $line = json_decode($line, true);
-                    $counter += getSearchPostCount($line['userId'], $search);
+
+                        $line = json_decode($line, true);
+                        $counter += getSearchPostCount($line['userId'], $search);
+
                 }
             }
             fclose($file);
@@ -457,11 +466,13 @@ function searchPosts($userId, $postsPerPage, $search, $shift)
         while (!feof($file) && $shift > 0) {
             if ($line = fgets($file)) {
                 $post = json_decode($line, true);
+                foreach ($search as $word) {
                 if (
-                    stripos($post['title'], $search) !== false ||
-                    stripos($post['content'], $search) !== false
+                    stripos($post['title'], $word) !== false ||
+                    stripos($post['content'], $word) !== false
                 ) {
                     $shift--;
+                }
                 }
             }
         }
@@ -512,4 +523,9 @@ function getPostPosition($userId, $post)
 
         }
     }
+}
+
+function splitSearch($search)
+{
+    return preg_split('/[\s,]+/', $search);
 }
