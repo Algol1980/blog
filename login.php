@@ -3,7 +3,11 @@ session_start();
 
 require 'functions.php';
 if(!empty($_POST)) {
-    if (isset($_POST['email']) && isset($_POST['password'])) {
+    if (isset($_POST['email']) && isset($_POST['password']))
+        if(isset($_POST['insys'])) {
+            setcookie()
+        }
+
         $user = checkUser($_POST['email'], $_POST['password']);
         if($user) {
             $_SESSION['user'] = true;
@@ -13,7 +17,7 @@ if(!empty($_POST)) {
             header("Location: index.php");
         }
         
-    }
+
 }
 require 'header.php';
 ?>
@@ -34,6 +38,10 @@ require 'header.php';
                     <div class="form-group">
                         <label>Password</label>
                         <input type="password" name="password" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Оставаться в системе</label>
+                        <input type="checkbox" name="insys" class="form-control" />
                     </div>
                     <div class="form-group">
                         <input type="submit" class="btn btn-primary form-control" />
