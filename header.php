@@ -7,7 +7,7 @@
  */
 $rightScripts = ['blog.php', 'photos.php', 'posts.php', 'search.php'];
 if(isset($_GET['download']) && !empty($_GET['userId']) && $_GET['download'] == 1) {
-    $images = getAllPhotosByUser($_GET['userId']);
+    $images = BlogDB::getAllPhotosByUser($_GET['userId']);
     $zip = new ZipArchive();
     $zipName = $_SESSION['lastName'] . time() . '.zip';
     if($zip->open($zipName, ZipArchive::CREATE)) {
@@ -51,7 +51,7 @@ if(isset($_GET['download']) && !empty($_GET['userId']) && $_GET['download'] == 1
             </button>
             <a class="navbar-brand" href="index.php">
                 <?php if (isset($_GET['userId']) && in_array(basename($_SERVER['SCRIPT_NAME']), $rightScripts)) {
-                    if ($currentUser = getUserById($_GET['userId'])) {
+                    if ($currentUser = BlogDB::getUserById($_GET['userId'])) {
                         echo $currentUser['firstName'] . " " . $currentUser['lastName'];
                     }
                 }

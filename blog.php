@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'functions.php';
+require 'BlogDB.php';
 $postsPerPage = 5;
 
 if (isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0) {
@@ -13,9 +13,9 @@ if (isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0) {
 if (!isset($_GET['userId'])) {
     header("Location: index.php");
 } else {
-    $userPosts = listPosts($_GET['userId'], $postsPerPage, $currentPage);
+    $userPosts = BlogDB::listPosts($_GET['userId'], $postsPerPage, $currentPage);
 }
-if ($totalPosts = getPostCountByUserId($_GET['userId'])) {
+if ($totalPosts = BlogDB::getPostCountByUserId($_GET['userId'])) {
     $totalPages = ceil($totalPosts/ $postsPerPage);
 }
 
@@ -44,7 +44,7 @@ require 'header.php';
 
 
         <nav>
-            <?php if ($pagination = renderPagination($totalPages, $currentPage)) { ?>
+            <?php if ($pagination = BlogDB::renderPagination($totalPages, $currentPage)) { ?>
                 <ul class="pagination">
                     <?php foreach ($pagination as $value) {
                         if ($value['isActive']) { ?>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'functions.php';
+require 'BlogDB.php';
 $imagesPerPage = 5;
 
 
@@ -14,9 +14,9 @@ if (isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0) {
 if (!isset($_GET['userId'])) {
     header("Location: index.php");
 } else {
-    $userImages = getPhotosByUser($_GET['userId'], $imagesPerPage, $currentPage);
+    $userImages = BlogDB::getPhotosByUser($_GET['userId'], $imagesPerPage, $currentPage);
 }
-if ($totalImages = getPhotosCount($_GET['userId'])) {
+if ($totalImages = BlogDB::getPhotosCount($_GET['userId'])) {
     $totalImagePages = ceil($totalImages / $imagesPerPage);
 }
 
@@ -38,7 +38,7 @@ require 'header.php';
 
 
     <nav>
-        <?php if ($pagination = renderPagination($totalImagePages, $currentPage)) { ?>
+        <?php if ($pagination = BlogDB::renderPagination($totalImagePages, $currentPage)) { ?>
             <ul class="pagination">
                 <?php foreach ($pagination as $value) {
                     if ($value['isActive']) { ?>

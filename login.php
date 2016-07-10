@@ -1,10 +1,10 @@
 <?php 
 session_start();
 
-require 'functions.php';
+require 'BlogDB.php';
 if(!empty($_POST)) {
     if (isset($_POST['email']) && isset($_POST['password'])) {
-        $user = checkUser($_POST['email'], $_POST['password']);
+        $user = BlogDB::checkUser($_POST['email'], $_POST['password']);
         if($user) {
             $_SESSION['user'] = true;
             $_SESSION['userId'] = $user['userId'];

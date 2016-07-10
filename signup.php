@@ -1,7 +1,7 @@
 <?php 
 session_start();
 
-require 'functions.php';
+require 'BlogDB.php';
 
 $required = ['email', 'firstName', 'lastName', 'password', 'confirmPassword'];
 
@@ -15,11 +15,11 @@ if ($_POST['password'] != $_POST['confirmPassword']) {
     $errorArray[] = 'Incorrect Password';
 }
     if (isset($errorArray)) {
-        $errorMessage = listErrors($errorArray);
+        $errorMessage = BlogDB::listErrors($errorArray);
     }
     else {
-        if(!isUserExist($_POST['email'])) {
-            $user = (addUser($_POST['email'], $_POST['firstName'], $_POST['lastName'], $_POST['password']));
+        if(!BlogDB::isUserExist($_POST['email'])) {
+            $user = (BlogDB::addUser($_POST['email'], $_POST['firstName'], $_POST['lastName'], $_POST['password']));
              if ($user) {
                 $_SESSION['user'] = true;
                 $_SESSION['userId'] = $user['userId'];

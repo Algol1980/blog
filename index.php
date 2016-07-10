@@ -1,11 +1,13 @@
 <?php
 session_start();
-require 'functions.php';
+require 'BlogDB.php';
+//require 'BlogDB.php';
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+BlogDB::getInstance();
 require 'header.php';
 ?>
 
@@ -31,7 +33,7 @@ require 'header.php';
         <th>Количество записей</th>
     </tr>
     </thead>
-<?php if ($bloggers = getBloggers()): ?>
+<?php if ($bloggers = BlogDB::getBloggers()): ?>
     <?php foreach ($bloggers as $blogger): ?>
         <tbody>
         <tr>
