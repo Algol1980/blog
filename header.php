@@ -6,6 +6,24 @@
  * and open the template in the editor.
  */
 $rightScripts = ['blog.php', 'photos.php', 'posts.php', 'search.php'];
+if(isset($_GET['download']) && !empty($_GET['userId']) && $_GET['download'] == 1) {
+    $images = getAllPhotosByUser($_GET['userId']);
+    $zip = new ZipArchive();
+    $zipName = $_SESSION['lastName'] . time() . '.zip';
+    if($zip->open($zipName, ZipArchive::CREATE)) {
+        foreach ($images as $image) {
+            $filePath = 'img/' . $image;
+            $zip->addFile($filePath);
+        }
+    }
+    $zip->close();
+    if(file_exists($zipName)) {
+        header('Content-Type: application/zip');
+        header("Content-Disposition: attachment; filename=$zipName");
+        header('Content-Length: ' . filesize($zipName));
+        header("Location: $zipName");
+    }
+}
 ?> 
 
 
@@ -82,6 +100,7 @@ $rightScripts = ['blog.php', 'photos.php', 'posts.php', 'search.php'];
                         <li><a href="#">Edit profile</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="logout.php">Logout</a></li>
+                        <li><a href="<?php $_SERVER['PHP_SELF']?>?download=1&userId=<?php echo isset($_SESSION['userId']) ? $_SESSION['userId'] : ''; ?>">Get all images</a></li>
                     </ul>
                 </li>
                 <?php  } ?>

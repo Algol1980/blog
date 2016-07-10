@@ -116,9 +116,9 @@ function addPost($userId, $title, $content, $filePath = false)
             fwrite($userDb, $line);
         }
         fclose($userDb);
-    }
-    else {
+    } else {
         $oldUserDb = fopen($oldDb, "a+");
+        fclose($oldUserDb);
     }
     fclose($oldUserDb);
 
@@ -512,4 +512,25 @@ function getPostPosition($userId, $post)
 
         }
     }
+}
+
+
+function getAllPhotosByUser($userId)
+{
+    $userImages = [];
+    $filePath = 'db/' . $userId . '.db';
+    if (file_exists($filePath)) {
+        $file = fopen($filePath, 'r');
+        while (!feof($file)) {
+            $line = fgets($file);
+            if ($line) {
+                $line = json_decode($line, true);
+                if ($line['image']) {
+                    array_push($userImages, $line['image']);
+                }
+            }
+        }
+        fclose($file);
+    }
+    return $userImages;
 }
